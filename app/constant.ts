@@ -7,7 +7,7 @@ export const PAY_URL = "https://www.buymeacoffee.com/yesmore/gallery";
 export const TIME_OUT_MS = 30000;
 export const CONTACT_URL =
   "https://qm.qq.com/cgi-bin/qm/qr?k=h-y3w16kVKwCuEGKbzlDP7NrQf2RHtLz&jump_from=webapi&authKey=xeKWKycUnzZ+9aeaVzJS23FYNHhoh/vHmp23BbLbz6bauaOhpwuWgTD6wYXsZ8iM";
-export const QACHAT_OLD_URL = "https://qachat.cc";
+export const QACHAT_OLD_URL = "https://a.mydog.buzz/";
 export const AD_URL = "https://shop.terobox.com/?from=1127";
 export const OFFICIAL_ACCOUNT_LINK =
   "https://i.postimg.cc/kgxnp4Bz/qrcode-for-gh-2f9c561cf713-430.jpg";
