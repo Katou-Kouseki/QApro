@@ -319,7 +319,17 @@ export function Chat(props: {
   useLayoutEffect(() => {
     setTimeout(() => {
       const dom = latestMessageRef.current;
-      if (dom && !isIOS() && autoScroll) {
+      const inputDom = inputRef.current;
+
+      // only scroll when input overlaped message body
+      let shouldScroll = true;
+      if (dom && inputDom) {
+        const domRect = dom.getBoundingClientRect();
+        const inputRect = inputDom.getBoundingClientRect();
+        shouldScroll = domRect.top > inputRect.top;
+      }
+
+      if (dom && autoScroll && shouldScroll) {
         dom.scrollIntoView({
           block: "end",
         });
@@ -455,7 +465,7 @@ export function Chat(props: {
             </div>
           );
         })}
-        <div ref={latestMessageRef} style={{ opacity: 0, height: "4em" }}>
+        <div ref={latestMessageRef} style={{ opacity: 0, height: "1em" }}>
           -
         </div>
       </div>
