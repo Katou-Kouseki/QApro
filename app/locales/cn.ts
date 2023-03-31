@@ -3,7 +3,8 @@ import { SubmitKey } from "../store/app";
 const cn = {
   WIP: "该功能仍在开发中……",
   Error: {
-    Unauthorized: "授权失败，请打开设置面板并填写授权码。(左下角扫码关注公众号即可获取，激活无限使用，无套路，保真～)",
+    Unauthorized:
+      "授权失败，请打开设置面板并填写授权码。(左下角扫码关注公众号即可获取，激活使用)",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} 条对话`,
