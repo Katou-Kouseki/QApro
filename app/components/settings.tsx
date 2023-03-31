@@ -49,7 +49,7 @@ export function Settings(props: { closeSettings: () => void }) {
       state.updateConfig,
       state.resetConfig,
       state.clearAllData,
-    ],
+    ]
   );
 
   const updateStore = useUpdateStore();
@@ -77,7 +77,7 @@ export function Settings(props: { closeSettings: () => void }) {
         setUsage({
           granted: res?.total_granted,
           used: res?.total_used,
-        }),
+        })
       )
       .finally(() => {
         setLoadingUsage(false);
@@ -92,7 +92,7 @@ export function Settings(props: { closeSettings: () => void }) {
   const accessStore = useAccessStore();
   const enabledAccessControl = useMemo(
     () => accessStore.enabledAccessControl(),
-    [],
+    []
   );
 
   const promptStore = usePromptStore();
@@ -152,12 +152,10 @@ export function Settings(props: { closeSettings: () => void }) {
                   }}
                 />
               }
-              open={showEmojiPicker}
-            >
+              open={showEmojiPicker}>
               <div
                 className={styles.avatar}
-                onClick={() => setShowEmojiPicker(true)}
-              >
+                onClick={() => setShowEmojiPicker(true)}>
                 <Avatar role="user" />
               </div>
             </Popover>
@@ -171,8 +169,7 @@ export function Settings(props: { closeSettings: () => void }) {
                 : hasNewVersion
                 ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
                 : Locale.Settings.Update.IsLatest
-            }
-          >
+            }>
             {checkingUpdate ? (
               <div />
             ) : hasNewVersion ? (
@@ -194,10 +191,9 @@ export function Settings(props: { closeSettings: () => void }) {
               onChange={(e) => {
                 updateConfig(
                   (config) =>
-                    (config.submitKey = e.target.value as any as SubmitKey),
+                    (config.submitKey = e.target.value as any as SubmitKey)
                 );
-              }}
-            >
+              }}>
               {Object.values(SubmitKey).map((v) => (
                 <option value={v} key={v}>
                   {v}
@@ -225,10 +221,9 @@ export function Settings(props: { closeSettings: () => void }) {
               value={config.theme}
               onChange={(e) => {
                 updateConfig(
-                  (config) => (config.theme = e.target.value as any as Theme),
+                  (config) => (config.theme = e.target.value as any as Theme)
                 );
-              }}
-            >
+              }}>
               {Object.values(Theme).map((v) => (
                 <option value={v} key={v}>
                   {v}
@@ -242,8 +237,7 @@ export function Settings(props: { closeSettings: () => void }) {
               value={getLang()}
               onChange={(e) => {
                 changeLang(e.target.value as any);
-              }}
-            >
+              }}>
               {AllLangs.map((lang) => (
                 <option value={lang} key={lang}>
                   {Locale.Settings.Lang.Options[lang]}
@@ -254,8 +248,7 @@ export function Settings(props: { closeSettings: () => void }) {
 
           <SettingItem
             title={Locale.Settings.FontSize.Title}
-            subTitle={Locale.Settings.FontSize.SubTitle}
-          >
+            subTitle={Locale.Settings.FontSize.SubTitle}>
             <input
               type="range"
               title={`${config.fontSize ?? 14}px`}
@@ -266,50 +259,43 @@ export function Settings(props: { closeSettings: () => void }) {
               onChange={(e) =>
                 updateConfig(
                   (config) =>
-                    (config.fontSize = Number.parseInt(e.currentTarget.value)),
+                    (config.fontSize = Number.parseInt(e.currentTarget.value))
                 )
-              }
-            ></input>
+              }></input>
           </SettingItem>
 
-          <div className="no-mobile">
-            <SettingItem title={Locale.Settings.TightBorder}>
-              <input
-                type="checkbox"
-                checked={config.tightBorder}
-                onChange={(e) =>
-                  updateConfig(
-                    (config) => (config.tightBorder = e.currentTarget.checked),
-                  )
-                }
-              ></input>
-            </SettingItem>
-          </div>
+          <SettingItem title={Locale.Settings.TightBorder}>
+            <input
+              type="checkbox"
+              checked={config.tightBorder}
+              onChange={(e) =>
+                updateConfig(
+                  (config) => (config.tightBorder = e.currentTarget.checked)
+                )
+              }></input>
+          </SettingItem>
         </List>
         <List>
           <SettingItem
             title={Locale.Settings.Prompt.Disable.Title}
-            subTitle={Locale.Settings.Prompt.Disable.SubTitle}
-          >
+            subTitle={Locale.Settings.Prompt.Disable.SubTitle}>
             <input
               type="checkbox"
               checked={config.disablePromptHint}
               onChange={(e) =>
                 updateConfig(
                   (config) =>
-                    (config.disablePromptHint = e.currentTarget.checked),
+                    (config.disablePromptHint = e.currentTarget.checked)
                 )
-              }
-            ></input>
+              }></input>
           </SettingItem>
 
           <SettingItem
             title={Locale.Settings.Prompt.List}
             subTitle={Locale.Settings.Prompt.ListCount(
               builtinCount,
-              customCount,
-            )}
-          >
+              customCount
+            )}>
             <IconButton
               icon={<EditIcon />}
               text={Locale.Settings.Prompt.Edit}
@@ -321,16 +307,14 @@ export function Settings(props: { closeSettings: () => void }) {
           {enabledAccessControl ? (
             <SettingItem
               title={Locale.Settings.AccessCode.Title}
-              subTitle={Locale.Settings.AccessCode.SubTitle}
-            >
+              subTitle={Locale.Settings.AccessCode.SubTitle}>
               <input
                 value={accessStore.accessCode}
                 type="password"
                 placeholder={Locale.Settings.AccessCode.Placeholder}
                 onChange={(e) => {
                   accessStore.updateCode(e.currentTarget.value);
-                }}
-              ></input>
+                }}></input>
             </SettingItem>
           ) : (
             <></>
@@ -338,16 +322,14 @@ export function Settings(props: { closeSettings: () => void }) {
 
           <SettingItem
             title={Locale.Settings.Token.Title}
-            subTitle={Locale.Settings.Token.SubTitle}
-          >
+            subTitle={Locale.Settings.Token.SubTitle}>
             <input
               value={accessStore.token}
               type="password"
               placeholder={Locale.Settings.Token.Placeholder}
               onChange={(e) => {
                 accessStore.updateToken(e.currentTarget.value);
-              }}
-            ></input>
+              }}></input>
           </SettingItem>
 
           <SettingItem
@@ -357,10 +339,9 @@ export function Settings(props: { closeSettings: () => void }) {
                 ? Locale.Settings.Usage.IsChecking
                 : Locale.Settings.Usage.SubTitle(
                     usage?.granted ?? "0.00",
-                    usage?.used ?? "0.00",
+                    usage?.used ?? "0.00"
                   )
-            }
-          >
+            }>
             {loadingUsage ? (
               <div />
             ) : (
@@ -374,8 +355,7 @@ export function Settings(props: { closeSettings: () => void }) {
 
           <SettingItem
             title={Locale.Settings.HistoryCount.Title}
-            subTitle={Locale.Settings.HistoryCount.SubTitle}
-          >
+            subTitle={Locale.Settings.HistoryCount.SubTitle}>
             <input
               type="range"
               title={config.historyMessageCount.toString()}
@@ -386,16 +366,14 @@ export function Settings(props: { closeSettings: () => void }) {
               onChange={(e) =>
                 updateConfig(
                   (config) =>
-                    (config.historyMessageCount = e.target.valueAsNumber),
+                    (config.historyMessageCount = e.target.valueAsNumber)
                 )
-              }
-            ></input>
+              }></input>
           </SettingItem>
 
           <SettingItem
             title={Locale.Settings.CompressThreshold.Title}
-            subTitle={Locale.Settings.CompressThreshold.SubTitle}
-          >
+            subTitle={Locale.Settings.CompressThreshold.SubTitle}>
             <input
               type="number"
               min={500}
@@ -405,10 +383,9 @@ export function Settings(props: { closeSettings: () => void }) {
                 updateConfig(
                   (config) =>
                     (config.compressMessageLengthThreshold =
-                      e.currentTarget.valueAsNumber),
+                      e.currentTarget.valueAsNumber)
                 )
-              }
-            ></input>
+              }></input>
           </SettingItem>
         </List>
 
@@ -418,11 +395,9 @@ export function Settings(props: { closeSettings: () => void }) {
               value={config.modelConfig.model}
               onChange={(e) => {
                 updateConfig(
-                  (config) =>
-                    (config.modelConfig.model = e.currentTarget.value),
+                  (config) => (config.modelConfig.model = e.currentTarget.value)
                 );
-              }}
-            >
+              }}>
               {ALL_MODELS.map((v) => (
                 <option value={v.name} key={v.name} disabled={!v.available}>
                   {v.name}
@@ -432,8 +407,7 @@ export function Settings(props: { closeSettings: () => void }) {
           </SettingItem>
           <SettingItem
             title={Locale.Settings.Temperature.Title}
-            subTitle={Locale.Settings.Temperature.SubTitle}
-          >
+            subTitle={Locale.Settings.Temperature.SubTitle}>
             <input
               type="range"
               value={config.modelConfig.temperature.toFixed(1)}
@@ -444,15 +418,13 @@ export function Settings(props: { closeSettings: () => void }) {
                 updateConfig(
                   (config) =>
                     (config.modelConfig.temperature =
-                      e.currentTarget.valueAsNumber),
+                      e.currentTarget.valueAsNumber)
                 );
-              }}
-            ></input>
+              }}></input>
           </SettingItem>
           <SettingItem
             title={Locale.Settings.MaxTokens.Title}
-            subTitle={Locale.Settings.MaxTokens.SubTitle}
-          >
+            subTitle={Locale.Settings.MaxTokens.SubTitle}>
             <input
               type="number"
               min={100}
@@ -462,15 +434,13 @@ export function Settings(props: { closeSettings: () => void }) {
                 updateConfig(
                   (config) =>
                     (config.modelConfig.max_tokens =
-                      e.currentTarget.valueAsNumber),
+                      e.currentTarget.valueAsNumber)
                 )
-              }
-            ></input>
+              }></input>
           </SettingItem>
           <SettingItem
             title={Locale.Settings.PresencePenlty.Title}
-            subTitle={Locale.Settings.PresencePenlty.SubTitle}
-          >
+            subTitle={Locale.Settings.PresencePenlty.SubTitle}>
             <input
               type="range"
               value={config.modelConfig.presence_penalty.toFixed(1)}
@@ -481,10 +451,9 @@ export function Settings(props: { closeSettings: () => void }) {
                 updateConfig(
                   (config) =>
                     (config.modelConfig.presence_penalty =
-                      e.currentTarget.valueAsNumber),
+                      e.currentTarget.valueAsNumber)
                 );
-              }}
-            ></input>
+              }}></input>
           </SettingItem>
         </List>
 

@@ -25,7 +25,13 @@ import StopIcon from "../icons/stop.svg";
 
 import { Message, SubmitKey, useChatStore, ChatSession } from "../store";
 import { showModal, showToast } from "./ui-lib";
-import { copyToClipboard, downloadAs, isIOS, selectOrCopy } from "../utils";
+import {
+  copyToClipboard,
+  downloadAs,
+  isIOS,
+  isMobileScreen,
+  selectOrCopy,
+} from "../utils";
 import Locale from "../locales";
 
 import dynamic from "next/dynamic";
@@ -612,7 +618,9 @@ export function Home() {
   return (
     <div
       className={`${
-        config.tightBorder ? styles["tight-container"] : styles.container
+        config.tightBorder && !isMobileScreen()
+          ? styles["tight-container"]
+          : styles.container
       }`}>
       <div
         className={
