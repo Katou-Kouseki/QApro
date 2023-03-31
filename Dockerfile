@@ -8,11 +8,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN \
-  if [ -f pnpm-lock.yaml  ]; then pnpm --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+RUN pnpm install
 
 FROM base AS builder
 
