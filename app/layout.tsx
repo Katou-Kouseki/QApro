@@ -7,10 +7,7 @@ import { ACCESS_CODES, IS_IN_DOCKER } from "./api/access";
 
 let COMMIT_ID: string | undefined;
 try {
-  COMMIT_ID = process
-    .execSync("git describe --tags --abbrev=0")
-    .toString()
-    .trim();
+  COMMIT_ID = process.execSync("git rev-parse --short HEAD").toString().trim();
 } catch (e) {
   console.error("No git or not from git repo.");
 }
