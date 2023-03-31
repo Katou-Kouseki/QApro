@@ -39,5 +39,3 @@ dev
 .env.development
 .env.local
 .env
-
-prompts.json

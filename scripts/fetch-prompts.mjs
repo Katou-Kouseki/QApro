@@ -5,10 +5,10 @@ const CN_URL = "https://nb.js.cn/prompts-zh";
 const EN_URL = "https://nb.js.cn/prompts";
 const FILE = "./public/prompts.json";
 
-async function fetchCN() {
-  console.log("[Fetch] fetching cn prompts...");
+async function fetchJson(url) {
+  console.log(`[Fetch] fetching ${url} prompts...`);
   try {
-    const raw = await (await fetch(CN_URL)).json();
+    const raw = await (await fetch(url)).json();
     return raw.map((v) => [v.act, v.prompt]);
   } catch (error) {
     console.error("[Fetch] failed to fetch cn prompts", error);
@@ -16,22 +16,8 @@ async function fetchCN() {
   }
 }
 
-async function fetchEN() {
-  console.log("[Fetch] fetching en prompts...");
-  try {
-    const raw = await (await fetch(EN_URL)).text();
-    return raw
-      .split("\n")
-      .slice(1)
-      .map((v) => v.split('","').map((v) => v.replace('"', "")));
-  } catch (error) {
-    console.error("[Fetch] failed to fetch cn prompts", error);
-    return [];
-  }
-}
-
 async function main() {
-  Promise.all([fetchCN(), fetchEN()])
+  Promise.all([fetchJson(CN_URL), fetchJson(EN_URL)])
     .then(([cn, en]) => {
       fs.writeFile(FILE, JSON.stringify({ cn, en }));
     })
