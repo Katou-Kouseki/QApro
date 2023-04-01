@@ -20,5 +20,5 @@ export async function requestOpenai(req: NextRequest) {
     method: req.method,
     body: req.body,
     // dispatcher: new ProxyAgent("http://127.0.0.1:7890"),
-  }) as any;
+  });
 }

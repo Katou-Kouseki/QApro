@@ -35,7 +35,7 @@ const makeImageRequestParam = (content: string): ImageRequest => {
   return {
     prompt: content,
     n: 1,
-    size: "1024x1024",
+    size: "256x256",
   };
 };
 
