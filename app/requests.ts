@@ -247,13 +247,21 @@ export async function requestCreateImage(
 
       options?.onController?.(controller);
 
-      // handle time out, will stop if no response in 10 secs
-      const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
-      const content = await reader?.read();
-      clearTimeout(resTimeoutId);
-      const text = decoder.decode(content?.value);
-      const parsed = JSON.parse(text);
-      console.log("[img]", parsed);
+      while (true) {
+        // handle time out, will stop if no response in 10 secs
+        const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
+        const content = await reader?.read();
+        clearTimeout(resTimeoutId);
+        const text = decoder.decode(content?.value);
+        responseText += text;
+
+        const done = !content || content.done;
+        if (done) {
+          break;
+        }
+      }
+      const parsed = JSON.parse(responseText);
+      console.log("[img]", responseText, parsed);
       if (parsed?.data) {
         responseText = `![${content}](${parsed.data[0].url})\n${content}, ${parsed.created}`;
         options?.onMessage(responseText, false);
