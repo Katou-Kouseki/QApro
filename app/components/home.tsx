@@ -60,6 +60,95 @@ const Emoji = dynamic(async () => (await import("emoji-picker-react")).Emoji, {
   loading: () => <LoadingIcon />,
 });
 
+const useHasHydrated = () => {
+  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
+
+  useEffect(() => {
+    setHasHydrated(true);
+  }, []);
+
+  return hasHydrated;
+};
+
+function useSwitchTheme() {
+  const config = useChatStore((state) => state.config);
+
+  useEffect(() => {
+    document.body.classList.remove("light");
+    document.body.classList.remove("dark");
+
+    if (config.theme === "dark") {
+      document.body.classList.add("dark");
+    } else if (config.theme === "light") {
+      document.body.classList.add("light");
+    }
+
+    const themeColor = getComputedStyle(document.body)
+      .getPropertyValue("--theme-color")
+      .trim();
+    const metaDescription = document.querySelector('meta[name="theme-color"]');
+    metaDescription?.setAttribute("content", themeColor);
+  }, [config.theme]);
+}
+
+function exportMessages(messages: Message[], topic: string) {
+  const mdText =
+    `# ${topic}\n\n` +
+    messages
+      .map((m) => {
+        return m.role === "user" ? `## ${m.content}` : m.content.trim();
+      })
+      .join("\n\n");
+  const filename = `${topic}.md`;
+
+  showModal({
+    title: Locale.Export.Title,
+    children: (
+      <div className="markdown-body">
+        <pre className={styles["export-content"]}>{mdText}</pre>
+      </div>
+    ),
+    actions: [
+      <IconButton
+        key="copy"
+        icon={<CopyIcon />}
+        bordered
+        text={Locale.Export.Copy}
+        onClick={() => copyToClipboard(mdText)}
+      />,
+      <IconButton
+        key="download"
+        icon={<DownloadIcon />}
+        bordered
+        text={Locale.Export.Download}
+        onClick={() => downloadAs(mdText, filename)}
+      />,
+    ],
+  });
+}
+
+function showMemoryPrompt(session: ChatSession) {
+  showModal({
+    title: `${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`,
+    children: (
+      <div className="markdown-body">
+        <pre className={styles["export-content"]}>
+          {session.memoryPrompt || Locale.Memory.EmptyContent}
+        </pre>
+      </div>
+    ),
+    actions: [
+      <IconButton
+        key="copy"
+        icon={<CopyIcon />}
+        bordered
+        text={Locale.Memory.Copy}
+        onClick={() => copyToClipboard(session.memoryPrompt)}
+      />,
+    ],
+  });
+}
+
 export function Avatar(props: { role: Message["role"] }) {
   const config = useChatStore((state) => state.config);
 
@@ -122,7 +211,7 @@ export function ChatList() {
           key={i}
           selected={i === selectedIndex}
           onClick={() => selectSession(i)}
-          onDelete={() => removeSession(i)}
+          onDelete={() => confirm(Locale.Home.DeleteChat) && removeSession(i)}
         />
       ))}
     </div>
@@ -233,8 +322,10 @@ export function Chat(props: {
       setPromptHints([]);
     } else if (!chatStore.config.disablePromptHint && n < SEARCH_TEXT_LIMIT) {
       // check if need to trigger auto completion
-      if (text.startsWith("/") && text.length > 1) {
+      if (text.startsWith("/")) {
         onSearch(text.slice(1));
+      } else if (text.startsWith("img")) {
+        console.log(1);
       }
     }
   };
@@ -471,7 +562,7 @@ export function Chat(props: {
             </div>
           );
         })}
-        <div ref={latestMessageRef} style={{ opacity: 0, height: "1.5em" }}>
+        <div ref={latestMessageRef} style={{ opacity: 0, height: "1px" }}>
           -
         </div>
       </div>
@@ -504,95 +595,6 @@ export function Chat(props: {
     </div>
   );
 }
-
-function useSwitchTheme() {
-  const config = useChatStore((state) => state.config);
-
-  useEffect(() => {
-    document.body.classList.remove("light");
-    document.body.classList.remove("dark");
-
-    if (config.theme === "dark") {
-      document.body.classList.add("dark");
-    } else if (config.theme === "light") {
-      document.body.classList.add("light");
-    }
-
-    const themeColor = getComputedStyle(document.body)
-      .getPropertyValue("--theme-color")
-      .trim();
-    const metaDescription = document.querySelector('meta[name="theme-color"]');
-    metaDescription?.setAttribute("content", themeColor);
-  }, [config.theme]);
-}
-
-function exportMessages(messages: Message[], topic: string) {
-  const mdText =
-    `# ${topic}\n\n` +
-    messages
-      .map((m) => {
-        return m.role === "user" ? `## ${m.content}` : m.content.trim();
-      })
-      .join("\n\n");
-  const filename = `${topic}.md`;
-
-  showModal({
-    title: Locale.Export.Title,
-    children: (
-      <div className="markdown-body">
-        <pre className={styles["export-content"]}>{mdText}</pre>
-      </div>
-    ),
-    actions: [
-      <IconButton
-        key="copy"
-        icon={<CopyIcon />}
-        bordered
-        text={Locale.Export.Copy}
-        onClick={() => copyToClipboard(mdText)}
-      />,
-      <IconButton
-        key="download"
-        icon={<DownloadIcon />}
-        bordered
-        text={Locale.Export.Download}
-        onClick={() => downloadAs(mdText, filename)}
-      />,
-    ],
-  });
-}
-
-function showMemoryPrompt(session: ChatSession) {
-  showModal({
-    title: `${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`,
-    children: (
-      <div className="markdown-body">
-        <pre className={styles["export-content"]}>
-          {session.memoryPrompt || Locale.Memory.EmptyContent}
-        </pre>
-      </div>
-    ),
-    actions: [
-      <IconButton
-        key="copy"
-        icon={<CopyIcon />}
-        bordered
-        text={Locale.Memory.Copy}
-        onClick={() => copyToClipboard(session.memoryPrompt)}
-      />,
-    ],
-  });
-}
-
-const useHasHydrated = () => {
-  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  return hasHydrated;
-};
 
 export function Home() {
   const [createNewSession, currentIndex, removeSession] = useChatStore(

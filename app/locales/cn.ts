@@ -97,8 +97,8 @@ const cn = {
       SubTitle: "当未压缩的历史消息超过该值时，将进行压缩",
     },
     Token: {
-      Title: "API Key 密钥",
-      SubTitle: "使用自己的 Key 可绕过受控访问限制",
+      Title: "API Key 密钥*",
+      SubTitle: "使用自己的 Key 可加快回复速度",
       Placeholder: "🗝 OpenAI API Key",
     },
     Usage: {
@@ -110,9 +110,9 @@ const cn = {
       Check: "重新检查",
     },
     AccessCode: {
-      Title: "访问授权码",
-      SubTitle: "现在是受控访问状态",
-      Placeholder: "🗝 请输入访问码",
+      Title: "访问授权码*",
+      SubTitle: "现在是受控访问状态，请在公众号申请授权码",
+      Placeholder: "🗝 请输入授权码",
     },
     Model: "模型 (model)",
     Temperature: {
