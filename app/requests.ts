@@ -157,6 +157,15 @@ export async function requestChatStream(
       console.error("Anauthorized");
       responseText = Locale.Error.Unauthorized;
       finish();
+    } else if (res.status === 402) {
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      const content = await reader?.read();
+ 
+      const text = decoder.decode(content?.value);
+      let parse = JSON.parse(text) || {};
+      responseText = parse?.msg
+      finish();
     } else {
       console.error("Stream Error", res.body);
       options?.onError(new Error("Stream Error"));

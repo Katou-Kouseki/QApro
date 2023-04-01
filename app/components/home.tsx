@@ -471,7 +471,7 @@ export function Chat(props: {
             </div>
           );
         })}
-        <div ref={latestMessageRef} style={{ opacity: 0, height: "1em" }}>
+        <div ref={latestMessageRef} style={{ opacity: 0, height: "1.5em" }}>
           -
         </div>
       </div>
