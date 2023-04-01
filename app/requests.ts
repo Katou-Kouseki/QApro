@@ -261,7 +261,7 @@ export async function requestCreateImage(
         }
       }
       const parsed = JSON.parse(responseText);
-      console.log("[img]", responseText, parsed);
+      console.log("[img]", parsed);
       if (parsed?.data) {
         responseText = `![${content}](${parsed.data[0].url})\n${content}, ${parsed.created}`;
         options?.onMessage(responseText, false);

@@ -331,7 +331,35 @@ export const useChatStore = create<ChatStore>()(
         if (content.startsWith("img ")) {
           const img_cmd = content.replace(/^img/, "").trim();
           // console.log(img_cmd);
-          requestCreateImage(img_cmd);
+          requestCreateImage(img_cmd, {
+            onMessage(content, done) {
+              // stream response
+              if (done) {
+                botMessage.streaming = false;
+                botMessage.content = content;
+                get().onNewMessage(botMessage);
+                ControllerPool.remove(sessionIndex, messageIndex);
+              } else {
+                botMessage.content = content;
+                set(() => ({}));
+              }
+            },
+            onError(error) {
+              botMessage.content += "\n\n" + Locale.Store.Error;
+              botMessage.streaming = false;
+              set(() => ({}));
+              ControllerPool.remove(sessionIndex, messageIndex);
+            },
+            onController(controller) {
+              // collect controller for stop/retry
+              ControllerPool.addController(
+                sessionIndex,
+                messageIndex,
+                controller
+              );
+            },
+            modelConfig: get().config.modelConfig,
+          });
         } else {
           requestChatStream(sendMessages, {
             onMessage(content, done) {
