@@ -324,8 +324,6 @@ export function Chat(props: {
       // check if need to trigger auto completion
       if (text.startsWith("/")) {
         onSearch(text.slice(1));
-      } else if (text.startsWith("img")) {
-        console.log(1);
       }
     }
   };
@@ -342,7 +340,7 @@ export function Chat(props: {
 
   // stop response
   const onUserStop = (messageIndex: number) => {
-    console.log(ControllerPool, sessionIndex, messageIndex);
+    // console.log(ControllerPool, sessionIndex, messageIndex);
     ControllerPool.stop(sessionIndex, messageIndex);
   };
 
@@ -574,7 +572,7 @@ export function Chat(props: {
             ref={inputRef}
             className={styles["chat-input"]}
             placeholder={Locale.Chat.Input(submitKey)}
-            rows={4}
+            rows={3}
             onInput={(e) => onInput(e.currentTarget.value)}
             value={userInput}
             onKeyDown={(e) => onInputKeyDown(e as any)}

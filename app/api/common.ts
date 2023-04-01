@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+// import { fetch, ProxyAgent } from "undici";
 
 const OPENAI_URL = "api.openai.com";
 const DEFAULT_PROTOCOL = "https";
@@ -9,7 +10,7 @@ export async function requestOpenai(req: NextRequest) {
   const apiKey = req.headers.get("token");
   const openaiPath = req.headers.get("path");
 
-  console.log("[Proxy] ", openaiPath);
+  // console.log("[Proxy] ", openaiPath);
 
   return fetch(`${PROTOCOL}://${BASE_URL}/${openaiPath}`, {
     headers: {
@@ -18,5 +19,6 @@ export async function requestOpenai(req: NextRequest) {
     },
     method: req.method,
     body: req.body,
-  });
+    // dispatcher: new ProxyAgent("http://127.0.0.1:7890"),
+  }) as any;
 }

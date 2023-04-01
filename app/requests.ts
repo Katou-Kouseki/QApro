@@ -1,4 +1,8 @@
-import type { ChatRequest, ChatReponse } from "./api/openai/typing";
+import type {
+  ChatRequest,
+  ChatReponse,
+  ImageRequest,
+} from "./api/openai/typing";
 import { filterConfig, Message, ModelConfig, useAccessStore } from "./store";
 import Locale from "./locales";
 
@@ -24,6 +28,14 @@ const makeRequestParam = (
     model: "gpt-3.5-turbo",
     messages: sendMessages,
     stream: options?.stream,
+  };
+};
+
+const makeImageRequestParam = (content: string): ImageRequest => {
+  return {
+    prompt: content,
+    n: 1,
+    size: "1024x1024",
   };
 };
 
@@ -161,10 +173,10 @@ export async function requestChatStream(
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       const content = await reader?.read();
- 
+
       const text = decoder.decode(content?.value);
       let parse = JSON.parse(text) || {};
-      responseText = parse?.msg
+      responseText = parse?.msg;
       finish();
     } else {
       console.error("Stream Error", res.body);
@@ -188,6 +200,92 @@ export async function requestWithPrompt(messages: Message[], prompt: string) {
   const res = await requestChat(messages);
 
   return res?.choices?.at(0)?.message?.content ?? "";
+}
+
+export async function requestCreateImage(
+  content: string,
+  options?: {
+    modelConfig?: ModelConfig;
+    onMessage: (message: string, done: boolean) => void;
+    onError: (error: Error) => void;
+    onController?: (controller: AbortController) => void;
+  }
+) {
+  const req = makeImageRequestParam(content);
+
+  // valid and assign model config
+  // if (options?.modelConfig) {
+  //   Object.assign(req, filterConfig(options.modelConfig));
+  // }
+
+  const controller = new AbortController();
+  const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
+
+  try {
+    const res = await fetch("/api/create-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        path: "v1/images/generations",
+        ...getHeaders(),
+      },
+      body: JSON.stringify(req),
+      signal: controller.signal,
+    });
+    clearTimeout(reqTimeoutId);
+
+    let responseText = "";
+
+    const finish = () => {
+      options?.onMessage(responseText, true);
+      controller.abort();
+    };
+
+    if (res.ok) {
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+
+      options?.onController?.(controller);
+
+      while (true) {
+        // handle time out, will stop if no response in 10 secs
+        const resTimeoutId = setTimeout(() => finish(), TIME_OUT_MS);
+        const content = await reader?.read();
+        clearTimeout(resTimeoutId);
+        const text = decoder.decode(content?.value);
+        // responseText += text;
+
+        const done = !content || content.done;
+        // options?.onMessage(responseText, false);
+        console.log("[img]", text);
+
+        if (done) {
+          break;
+        }
+      }
+
+      finish();
+    } else if (res.status === 401) {
+      console.error("Anauthorized");
+      responseText = Locale.Error.Unauthorized;
+      finish();
+    } else if (res.status === 402) {
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      const content = await reader?.read();
+
+      const text = decoder.decode(content?.value);
+      let parse = JSON.parse(text) || {};
+      responseText = parse?.msg;
+      finish();
+    } else {
+      console.error("Stream Error", res.body);
+      options?.onError(new Error("Stream Error"));
+    }
+  } catch (err) {
+    console.error("NetWork Error", err);
+    options?.onError(err as Error);
+  }
 }
 
 // To store message streaming controller
