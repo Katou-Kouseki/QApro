@@ -202,17 +202,6 @@ export function Settings(props: { closeSettings: () => void }) {
             </select>
           </SettingItem>
 
-          <SettingItem title={Locale.Settings.previewInput}>
-            <input
-              type="checkbox"
-              checked={config.previewInput}
-              onChange={(e) =>
-                updateConfig(
-                  (config) => (config.previewInput = e.currentTarget.checked)
-                )
-              }></input>
-          </SettingItem>
-
           <ListItem>
             <div className={styles["settings-title"]}>
               {Locale.Settings.Theme}

@@ -40,7 +40,6 @@ export interface ChatConfig {
   fontSize: number;
   theme: Theme;
   tightBorder: boolean;
-  previewInput: boolean;
 
   disablePromptHint: boolean;
 
@@ -130,7 +129,6 @@ const DEFAULT_CONFIG: ChatConfig = {
   fontSize: 14,
   theme: Theme.Auto as Theme,
   tightBorder: true,
-  previewInput: false,
 
   disablePromptHint: false,
 
