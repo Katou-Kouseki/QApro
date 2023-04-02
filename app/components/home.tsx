@@ -7,9 +7,7 @@ import Recomment from "./Recomment";
 import { IconButton } from "./button";
 import styles from "./home.module.scss";
 
-// import LoadingCss from "./loading";
 import SettingsIcon from "../icons/settings.svg";
-import GithubIcon from "../icons/github.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import ExportIcon from "../icons/export.svg";
@@ -25,18 +23,17 @@ import RefreshIcon from "../icons/refresh.svg";
 import StopIcon from "../icons/stop.svg";
 
 import { Message, SubmitKey, useChatStore, ChatSession } from "../store";
-import { showModal, showToast } from "./ui-lib";
+import { showModal } from "./ui-lib";
 import {
   copyToClipboard,
   downloadAs,
-  isIOS,
   isMobileScreen,
   selectOrCopy,
 } from "../utils";
 import Locale from "../locales";
 
 import dynamic from "next/dynamic";
-import { REPO_URL, PAY_URL, QACHAT_OLD_URL, AD_URL } from "../constant";
+import { PAY_URL, QACHAT_OLD_URL, AD_URL } from "../constant";
 import { ControllerPool } from "../requests";
 import { Prompt, usePromptStore } from "../store/prompt";
 
