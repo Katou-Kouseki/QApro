@@ -3,7 +3,14 @@ import type {
   ChatReponse,
   ImageRequest,
 } from "./api/openai/typing";
-import { filterConfig, Message, ModelConfig, useAccessStore } from "./store";
+import {
+  filterConfig,
+  filterImageConfig,
+  ImageModelConfig,
+  Message,
+  ModelConfig,
+  useAccessStore,
+} from "./store";
 import Locale from "./locales";
 
 const TIME_OUT_MS = 30000;
@@ -205,7 +212,7 @@ export async function requestWithPrompt(messages: Message[], prompt: string) {
 export async function requestCreateImage(
   content: string,
   options?: {
-    modelConfig?: ModelConfig;
+    imageModelConfig?: ImageModelConfig;
     onMessage: (message: string, done: boolean) => void;
     onError: (error: Error) => void;
     onController?: (controller: AbortController) => void;
@@ -214,9 +221,9 @@ export async function requestCreateImage(
   const req = makeImageRequestParam(content);
 
   // valid and assign model config
-  // if (options?.modelConfig) {
-  //   Object.assign(req, filterConfig(options.modelConfig));
-  // }
+  if (options?.imageModelConfig) {
+    Object.assign(req, filterImageConfig(options.imageModelConfig));
+  }
 
   const controller = new AbortController();
   const reqTimeoutId = setTimeout(() => controller.abort(), TIME_OUT_MS);
@@ -261,7 +268,7 @@ export async function requestCreateImage(
         }
       }
       const parsed = JSON.parse(responseText);
-      console.log("[img]", parsed);
+      // console.log("[img]", parsed);
       if (parsed?.data) {
         responseText = `![${content}](${parsed.data[0].url})\n${content}, ${parsed.created}`;
         options?.onMessage(responseText, false);
@@ -308,7 +315,7 @@ export const ControllerPool = {
   stop(sessionIndex: number, messageIndex: number) {
     const key = this.key(sessionIndex, messageIndex);
     const controller = this.controllers[key];
-    console.log(controller);
+    // console.log(controller);
     controller?.abort();
   },
 

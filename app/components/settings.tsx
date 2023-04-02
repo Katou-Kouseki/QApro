@@ -11,6 +11,7 @@ import {
   SubmitKey,
   useChatStore,
   Theme,
+  ImageSize,
   ALL_MODELS,
   useUpdateStore,
   useAccessStore,
@@ -444,6 +445,36 @@ export function Settings(props: { closeSettings: () => void }) {
                 );
               }}></input>
           </SettingItem>
+        </List>
+
+        <List>
+          <div style={{ padding: "0 20px" }}>
+            <h4 style={{ margin: "10px 0 0" }}>{Locale.Settings.Image}</h4>
+            <span style={{ fontSize: "12px" }}>
+              {Locale.Settings.ImageDesc}
+            </span>
+          </div>
+
+          <ListItem>
+            <div className={styles["settings-title"]}>
+              {Locale.Settings.ImageSize.Name}
+            </div>
+            <select
+              value={config.imageModelConfig.size}
+              onChange={(e) => {
+                updateConfig(
+                  (config) =>
+                    (config.imageModelConfig.size = e.target
+                      .value as any as ImageSize)
+                );
+              }}>
+              {Object.values(ImageSize).map((v) => (
+                <option value={v} key={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </ListItem>
         </List>
 
         <List>

@@ -62,6 +62,20 @@ const en: LocaleType = {
       },
     },
     Avatar: "Avatar",
+    Image: "Image generate",
+    ImageDesc: "Input format: img+[space]+description, example: img a bird",
+    ImageNumber: {
+      Title: "Image count",
+      SubTitle: "Number of images generated at one time",
+    },
+    ImageSize: {
+      Name: "Image size",
+      Options: {
+        256: "256x256",
+        512: "512x512",
+        1024: "1024x1024",
+      },
+    },
     FontSize: {
       Title: "Font Size",
       SubTitle: "Adjust font size of chat content",

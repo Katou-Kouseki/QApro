@@ -31,6 +31,12 @@ export enum Theme {
   Light = "light",
 }
 
+export enum ImageSize {
+  Small = "256x256",
+  Middle = "512x512",
+  Large = "1024x1024",
+}
+
 export interface ChatConfig {
   historyMessageCount: number; // -1 means all
   compressMessageLengthThreshold: number;
@@ -49,11 +55,17 @@ export interface ChatConfig {
     max_tokens: number;
     presence_penalty: number;
   };
+  imageModelConfig: {
+    n: number;
+    size: string;
+  };
 }
 
 export type ModelConfig = ChatConfig["modelConfig"];
+export type ImageModelConfig = ChatConfig["imageModelConfig"];
 
 const ENABLE_GPT4 = true;
+const ENABLE_SIZE = true;
 
 export const ALL_MODELS = [
   {
@@ -82,8 +94,27 @@ export const ALL_MODELS = [
   },
 ];
 
+export const ALL_SIZES = [
+  {
+    name: "256x256",
+    available: ENABLE_SIZE,
+  },
+  {
+    name: "512x512",
+    available: ENABLE_SIZE,
+  },
+  {
+    name: "1024x1024",
+    available: ENABLE_SIZE,
+  },
+];
+
 export function isValidModel(name: string) {
   return ALL_MODELS.some((m) => m.name === name && m.available);
+}
+
+export function isValidSize(name: string) {
+  return ALL_SIZES.some((m) => m.name === name && m.available);
 }
 
 export function isValidNumber(x: number, min: number, max: number) {
@@ -120,6 +151,34 @@ export function filterConfig(oldConfig: ModelConfig): Partial<ModelConfig> {
   return config;
 }
 
+export function filterImageConfig(
+  oldConfig: ImageModelConfig
+): Partial<ImageModelConfig> {
+  const config = Object.assign({}, oldConfig);
+
+  const validator: {
+    [k in keyof ImageModelConfig]: (
+      x: ImageModelConfig[keyof ImageModelConfig]
+    ) => boolean;
+  } = {
+    size(x) {
+      return isValidSize(x as string);
+    },
+    n(x) {
+      return isValidNumber(x as number, 1, 4);
+    },
+  };
+
+  Object.keys(validator).forEach((k) => {
+    const key = k as keyof ImageModelConfig;
+    if (!validator[key](config[key])) {
+      delete config[key];
+    }
+  });
+
+  return config;
+}
+
 const DEFAULT_CONFIG: ChatConfig = {
   historyMessageCount: 4,
   compressMessageLengthThreshold: 1000,
@@ -137,6 +196,10 @@ const DEFAULT_CONFIG: ChatConfig = {
     temperature: 1,
     max_tokens: 2000,
     presence_penalty: 0,
+  },
+  imageModelConfig: {
+    n: 1,
+    size: "256x256",
   },
 };
 
@@ -356,7 +419,7 @@ export const useChatStore = create<ChatStore>()(
                 controller
               );
             },
-            modelConfig: get().config.modelConfig,
+            imageModelConfig: get().config.imageModelConfig,
           });
         } else {
           requestChatStream(sendMessages, {

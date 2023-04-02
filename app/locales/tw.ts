@@ -61,6 +61,20 @@ const tw: LocaleType = {
       },
     },
     Avatar: "大頭貼",
+    Image: "图像生成",
+    ImageDesc: "输入格式：img+空格+描述，例：img 一只鸟",
+    ImageNumber: {
+      Title: "图片数量",
+      SubTitle: "一次性生成图片的数量",
+    },
+    ImageSize: {
+      Name: "图像尺寸",
+      Options: {
+        256: "256x256",
+        512: "512x512",
+        1024: "1024x1024",
+      },
+    },
     FontSize: {
       Title: "字型大小",
       SubTitle: "聊天內容的字型大小",
