@@ -7,6 +7,7 @@ import Recomment from "./Recomment";
 import { IconButton } from "./button";
 import styles from "./home.module.scss";
 
+// import LoadingCss from "./loading";
 import SettingsIcon from "../icons/settings.svg";
 import GithubIcon from "../icons/github.svg";
 import SendWhiteIcon from "../icons/send-white.svg";
@@ -15,7 +16,7 @@ import ExportIcon from "../icons/export.svg";
 import BotIcon from "../icons/bot.svg";
 import AddIcon from "../icons/add.svg";
 import DeleteIcon from "../icons/delete.svg";
-import LoadingIcon from "../icons/three-dots.svg";
+import LoadingIcon from "./loading";
 import MenuIcon from "../icons/menu.svg";
 import CloseIcon from "../icons/close.svg";
 import CopyIcon from "../icons/copy.svg";
@@ -42,7 +43,7 @@ import { Prompt, usePromptStore } from "../store/prompt";
 export function Loading(props: { noLogo?: boolean }) {
   return (
     <div className={styles["loading-content"]}>
-      {!props.noLogo && <BotIcon />}
+      {/* {!props.noLogo && <BotIcon />} */}
       <LoadingIcon />
     </div>
   );
