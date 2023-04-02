@@ -460,7 +460,7 @@ export function Settings(props: { closeSettings: () => void }) {
               {Locale.Settings.ImageSize.Name}
             </div>
             <select
-              value={config?.imageModelConfig?.size || "256x256"}
+              value={config.imageModelConfig.size}
               onChange={(e) => {
                 updateConfig(
                   (config) =>
