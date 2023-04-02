@@ -642,7 +642,7 @@ export function Home() {
           <ChatList />
         </div>
 
-        <Recomment />
+        <Recomment fontSize={config.fontSize} />
         <div className={styles["sidebar-tail"]}>
           <div className={styles["sidebar-actions"]}>
             <div className={styles["sidebar-action"] + " " + styles.mobile}>

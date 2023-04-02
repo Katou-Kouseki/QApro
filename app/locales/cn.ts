@@ -1,7 +1,7 @@
 import { SubmitKey } from "../store/app";
 
 const cn = {
-  WIP: "该功能仍在开发中……",
+  WIP: "开发中",
   Error: {
     Unauthorized:
       "授权失败，请打开设置面板并填写授权码。(左下角扫码关注公众号即可获取，激活使用)",
@@ -144,7 +144,7 @@ const cn = {
   },
   Store: {
     DefaultTopic: "新的对话",
-    BotHello: "喵，有什么可以帮你的吗",
+    BotHello: "喵，有什么可以帮你的吗？",
     Error: "服务器开小差了，请稍后再试",
     Prompt: {
       History: (content: string) =>
