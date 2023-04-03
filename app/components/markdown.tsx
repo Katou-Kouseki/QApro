@@ -3,9 +3,9 @@ import "katex/dist/katex.min.css";
 import RemarkMath from "remark-math";
 import RehypeKatex from "rehype-katex";
 import RemarkGfm from "remark-gfm";
-import RehypePrsim from "rehype-prism-plus";
 import RemarkBreaks from "remark-breaks";
-import { useRef } from "react";
+import RehypeHighlight from "rehype-highlight";
+import { useRef, useState, RefObject, useEffect } from "react";
 import { copyToClipboard } from "../utils";
 
 export function PreCode(props: { children: any }) {
@@ -26,11 +26,43 @@ export function PreCode(props: { children: any }) {
   );
 }
 
+const useLazyLoad = (ref: RefObject<Element>): boolean => {
+  const [isIntersecting, setIntersecting] = useState<boolean>(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIntersecting(true);
+        observer.disconnect();
+      }
+    });
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref]);
+
+  return isIntersecting;
+};
+
 export function Markdown(props: { content: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[RemarkMath, RemarkGfm, RemarkBreaks]}
-      rehypePlugins={[RehypeKatex, [RehypePrsim, { ignoreMissing: true }]]}
+      rehypePlugins={[
+        RehypeKatex,
+        [
+          RehypeHighlight,
+          {
+            detect: false,
+            ignoreMissing: true,
+          },
+        ],
+      ]}
       components={{
         pre: PreCode,
       }}>

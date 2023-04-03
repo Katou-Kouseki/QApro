@@ -15,6 +15,7 @@ import Locale from "../locales";
 export type Message = ChatCompletionResponseMessage & {
   date: string;
   streaming?: boolean;
+  isError?: boolean;
 };
 
 export enum SubmitKey {
@@ -46,6 +47,7 @@ export interface ChatConfig {
   fontSize: number;
   theme: Theme;
   tightBorder: boolean;
+  sendPreviewBubble: boolean;
 
   disablePromptHint: boolean;
 
@@ -63,6 +65,8 @@ export interface ChatConfig {
 
 export type ModelConfig = ChatConfig["modelConfig"];
 export type ImageModelConfig = ChatConfig["imageModelConfig"];
+
+export const ROLES: Message["role"][] = ["system", "user", "assistant"];
 
 const ENABLE_GPT4 = true;
 const ENABLE_SIZE = true;
@@ -131,7 +135,7 @@ export function filterConfig(oldConfig: ModelConfig): Partial<ModelConfig> {
       return isValidModel(x as string);
     },
     max_tokens(x) {
-      return isValidNumber(x as number, 100, 4000);
+      return isValidNumber(x as number, 100, 32000);
     },
     presence_penalty(x) {
       return isValidNumber(x as number, -2, 2);
@@ -188,6 +192,7 @@ const DEFAULT_CONFIG: ChatConfig = {
   fontSize: 14,
   theme: Theme.Auto as Theme,
   tightBorder: true,
+  sendPreviewBubble: false,
 
   disablePromptHint: false,
 
@@ -214,12 +219,18 @@ export interface ChatSession {
   topic: string;
   memoryPrompt: string;
   messages: Message[];
+  context: Message[];
   stat: ChatStat;
   lastUpdate: string;
   lastSummarizeIndex: number;
 }
 
 const DEFAULT_TOPIC = Locale.Store.DefaultTopic;
+export const BOT_HELLO: Message = {
+  role: "assistant",
+  content: Locale.Store.BotHello,
+  date: "",
+};
 
 function createEmptySession(): ChatSession {
   const createDate = new Date().toLocaleString();
@@ -228,13 +239,8 @@ function createEmptySession(): ChatSession {
     id: Date.now(),
     topic: DEFAULT_TOPIC,
     memoryPrompt: "",
-    messages: [
-      {
-        role: "assistant",
-        content: Locale.Store.BotHello,
-        date: createDate,
-      },
-    ],
+    context: [],
+    messages: [],
     stat: {
       tokenCount: 0,
       wordCount: 0,
@@ -249,6 +255,7 @@ interface ChatStore {
   config: ChatConfig;
   sessions: ChatSession[];
   currentSessionIndex: number;
+  clearSessions: () => void;
   removeSession: (index: number) => void;
   selectSession: (index: number) => void;
   newSession: () => void;
@@ -285,6 +292,13 @@ export const useChatStore = create<ChatStore>()(
       currentSessionIndex: 0,
       config: {
         ...DEFAULT_CONFIG,
+      },
+
+      clearSessions() {
+        set(() => ({
+          sessions: [createEmptySession()],
+          currentSessionIndex: 0,
+        }));
       },
 
       resetConfig() {
@@ -405,9 +419,15 @@ export const useChatStore = create<ChatStore>()(
                 set(() => ({}));
               }
             },
-            onError(error) {
-              botMessage.content += "\n\n" + Locale.Store.Error;
+            onError(error, statusCode) {
+              if (statusCode === 401) {
+                botMessage.content = Locale.Error.Unauthorized;
+              } else {
+                botMessage.content += "\n\n" + Locale.Store.Error;
+              }
               botMessage.streaming = false;
+              userMessage.isError = true;
+              botMessage.isError = true;
               set(() => ({}));
               ControllerPool.remove(sessionIndex, messageIndex);
             },
@@ -435,9 +455,15 @@ export const useChatStore = create<ChatStore>()(
                 set(() => ({}));
               }
             },
-            onError(error) {
-              botMessage.content += "\n\n" + Locale.Store.Error;
+            onError(error, statusCode) {
+              if (statusCode === 401) {
+                botMessage.content = Locale.Error.Unauthorized;
+              } else {
+                botMessage.content += "\n\n" + Locale.Store.Error;
+              }
               botMessage.streaming = false;
+              userMessage.isError = true;
+              botMessage.isError = true;
               set(() => ({}));
               ControllerPool.remove(sessionIndex, messageIndex);
             },
@@ -468,16 +494,19 @@ export const useChatStore = create<ChatStore>()(
       getMessagesWithMemory() {
         const session = get().currentSession();
         const config = get().config;
-        const n = session.messages.length;
-        const recentMessages = session.messages.slice(
-          n - config.historyMessageCount
-        );
+        const messages = session.messages.filter((msg) => !msg.isError);
+        const n = messages.length;
 
-        const memoryPrompt = get().getMemoryPrompt();
+        const context = session.context.slice();
 
-        if (session.memoryPrompt) {
-          recentMessages.unshift(memoryPrompt);
+        if (session.memoryPrompt && session.memoryPrompt.length > 0) {
+          const memoryPrompt = get().getMemoryPrompt();
+          context.push(memoryPrompt);
         }
+
+        const recentMessages = context.concat(
+          messages.slice(Math.max(0, n - config.historyMessageCount))
+        );
 
         return recentMessages;
       },
@@ -518,9 +547,10 @@ export const useChatStore = create<ChatStore>()(
         );
         const historyMsgLength = countMessages(toBeSummarizedMsgs);
 
-        if (historyMsgLength > 4000) {
+        if (historyMsgLength > get().config?.modelConfig?.max_tokens ?? 4000) {
+          const n = toBeSummarizedMsgs.length;
           toBeSummarizedMsgs = toBeSummarizedMsgs.slice(
-            -config.historyMessageCount
+            Math.max(0, n - config.historyMessageCount)
           );
         }
 
@@ -583,7 +613,16 @@ export const useChatStore = create<ChatStore>()(
     }),
     {
       name: LOCAL_KEY,
-      version: 1,
+      version: 1.1,
+      migrate(persistedState, version) {
+        const state = persistedState as ChatStore;
+
+        if (version === 1) {
+          state.sessions.forEach((s) => (s.context = []));
+        }
+
+        return state;
+      },
     }
   )
 );

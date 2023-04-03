@@ -16,7 +16,7 @@ import {
   useUpdateStore,
   useAccessStore,
 } from "../store";
-import { Avatar, PromptHints } from "./home";
+import { Avatar } from "./chat";
 import Locale, { AllLangs, changeLang, getLang } from "../locales";
 import { getCurrentVersion } from "../utils";
 import Link from "next/link";
@@ -44,14 +44,14 @@ function SettingItem(props: {
 
 export function Settings(props: { closeSettings: () => void }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [config, updateConfig, resetConfig, clearAllData] = useChatStore(
-    (state) => [
+  const [config, updateConfig, resetConfig, clearAllData, clearSessions] =
+    useChatStore((state) => [
       state.config,
       state.updateConfig,
       state.resetConfig,
       state.clearAllData,
-    ]
-  );
+      state.clearSessions,
+    ]);
 
   const updateStore = useUpdateStore();
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -67,7 +67,6 @@ export function Settings(props: { closeSettings: () => void }) {
   }
 
   const [usage, setUsage] = useState<{
-    granted?: number;
     used?: number;
   }>();
   const [loadingUsage, setLoadingUsage] = useState(false);
@@ -76,8 +75,7 @@ export function Settings(props: { closeSettings: () => void }) {
     requestUsage()
       .then((res) =>
         setUsage({
-          granted: res?.total_granted,
-          used: res?.total_used,
+          used: res,
         })
       )
       .finally(() => {
@@ -115,7 +113,7 @@ export function Settings(props: { closeSettings: () => void }) {
           <div className={styles["window-action-button"]}>
             <IconButton
               icon={<ClearIcon />}
-              onClick={clearAllData}
+              onClick={clearSessions}
               bordered
               title={Locale.Settings.Actions.ClearAll}
             />
@@ -264,6 +262,17 @@ export function Settings(props: { closeSettings: () => void }) {
                 )
               }></input>
           </SettingItem>
+          <SettingItem title={Locale.Settings.SendPreviewBubble}>
+            <input
+              type="checkbox"
+              checked={config.sendPreviewBubble}
+              onChange={(e) =>
+                updateConfig(
+                  (config) =>
+                    (config.sendPreviewBubble = e.currentTarget.checked)
+                )
+              }></input>
+          </SettingItem>
         </List>
         <List>
           <SettingItem
@@ -327,10 +336,7 @@ export function Settings(props: { closeSettings: () => void }) {
             subTitle={
               loadingUsage
                 ? Locale.Settings.Usage.IsChecking
-                : Locale.Settings.Usage.SubTitle(
-                    usage?.granted ?? "0.00",
-                    usage?.used ?? "0.00"
-                  )
+                : Locale.Settings.Usage.SubTitle(usage?.used ?? "[?]")
             }>
             {loadingUsage ? (
               <div />

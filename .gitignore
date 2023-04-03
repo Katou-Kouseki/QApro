@@ -39,3 +39,5 @@ dev
 .env.development
 .env.local
 .env
+
+public/prompts.json
